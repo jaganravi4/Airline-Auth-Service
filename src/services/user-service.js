@@ -39,7 +39,27 @@ class UserService {
 
             return token;
         } catch (error) {
-            console.log("Something went wrong in the signIn");
+            console.log("Something went wrong in the signIn process");
+            throw { error };
+        }
+    }
+
+    async isAuthenticated(token) {
+        try {
+            const response = this.verifyToken(token);
+
+            if (!response) {
+                throw { error: "Invalid token" };
+            }
+
+            const user = await this.userRepository.getById(response.id);
+
+            if (!user) {
+                throw { error: "No user with the corresponding id" };
+            }
+            return user.id;
+        } catch (error) {
+            console.log("Something went wrong in the isAuthenticated process");
             throw { error };
         }
     }
