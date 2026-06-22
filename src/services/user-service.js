@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const UserRepository = require("../repositories/user-repository");
 const { JWT_KEY } = require("../config/serverConfig");
@@ -14,6 +15,31 @@ class UserService {
             return user;
         } catch (error) {
             console.log("Something went wrong in the user service");
+            throw { error };
+        }
+    }
+
+    async signIn(email, plainPassword) {
+        try {
+            const user = await this.userRepository.getByEmail(email);
+            const passwordsMatch = this.checkPassword(
+                plainPassword,
+                user.password,
+            );
+
+            if (!passwordsMatch) {
+                console.log("Password doesn't match");
+                throw { error: "Incorrect password" };
+            }
+
+            const token = this.createToken({
+                email: user.email,
+                id: user.id,
+            });
+
+            return token;
+        } catch (error) {
+            console.log("Something went wrong in the signIn");
             throw { error };
         }
     }
@@ -36,6 +62,18 @@ class UserService {
             return response;
         } catch (error) {
             console.log("Something went wrong in token validation", error);
+            throw { error };
+        }
+    }
+
+    checkPassword(userInputPlainPassword, encryptedPassword) {
+        try {
+            return bcrypt.compareSync(
+                userInputPlainPassword,
+                encryptedPassword,
+            );
+        } catch (error) {
+            console.log("Something went wrong in password verification");
             throw { error };
         }
     }

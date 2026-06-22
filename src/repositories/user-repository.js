@@ -23,6 +23,20 @@ class UserRepository {
         }
     }
 
+    async getByEmail(email) {
+        try {
+            const user = await User.findOne({
+                where: {
+                    email: email,
+                },
+            });
+            return user;
+        } catch (error) {
+            console.log("Something went wrong in the user repository");
+            throw { error };
+        }
+    }
+
     async delete(userId) {
         try {
             await User.destroy({
