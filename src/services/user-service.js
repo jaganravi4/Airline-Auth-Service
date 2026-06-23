@@ -64,6 +64,16 @@ class UserService {
         }
     }
 
+    async isAdmin(id) {
+        try {
+            const response = this.userRepository.isAdmin(id);
+            return response;
+        } catch (error) {
+            console.log("Something went wrong in the isAdmin process");
+            throw { error };
+        }
+    }
+
     createToken(user) {
         try {
             const token = jwt.sign(user, JWT_KEY, {
